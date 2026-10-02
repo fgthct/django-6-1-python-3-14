@@ -1,0 +1,95 @@
+{% extends "documenti/base.html" %}
+{% block titolo %}{{ documento.titolo }}{% endblock %}
+{% block contenuto %}
+<section>
+  <h1>{{ documento.titolo }}</h1>
+  <p class="attenuato">Proprietario: {{ documento.proprietario.get_full_name|default:documento.proprietario.username }}
+     · versione corrente: v{{ documento.versione_corrente.numero }}</p>
+</section>
+
+{% partialdef flusso %}
+<div id="flusso">
+  {% if avvisi %}<ul class="messaggi">{% for m in avvisi %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+  <section>
+    <h2>Stato: <span class="etichetta {{ documento.stato }}">{{ documento.get_stato_display }}</span></h2>
+
+    {% if revisione %}
+      <p>Revisione <strong>{{ revisione.get_modalita_display }}</strong>, versione {{ revisione.versione.numero }}.</p>
+      {% if revisione.messaggio %}<p class="scheda">{{ revisione.messaggio|linebreaksbr }}</p>{% endif %}
+      <table>
+        {% for p in revisione.partecipanti.all %}
+          <tr><td>{{ p.ordine }}</td><td>{{ p.utente.get_full_name|default:p.utente.username }}</td>
+              <td>{{ p.get_decisione_display }}</td><td>{{ p.commento }}</td></tr>
+        {% endfor %}
+      </table>
+      {% if tocca_a_me %}
+        <form hx-post="{% url 'decidi' documento.pk %}" hx-target="#flusso" hx-swap="outerHTML">
+          {{ decisione.as_p }}
+          <button name="esito" value="approva" class="primario">Approva</button>
+          <button name="esito" value="rimanda" class="pericolo">Rimanda in bozza</button>
+        </form>
+      {% endif %}
+      {% if livello == PROPRIETARIO %}
+        <form hx-post="{% url 'annulla' documento.pk %}" hx-target="#flusso" hx-swap="outerHTML">
+          <button class="pericolo">Annulla la revisione</button>
+        </form>
+      {% endif %}
+    {% elif documento.stato == "bozza" and livello == PROPRIETARIO %}
+      {% if conclusa and conclusa.stato == "rimandata" %}
+        <p class="scheda">Rimandato in bozza.
+          {% for p in conclusa.partecipanti.all %}{% if p.commento %}<br><strong>{{ p.utente.get_full_name|default:p.utente.username }}</strong>: {{ p.commento }}{% endif %}{% endfor %}</p>
+      {% endif %}
+      <h3>Invia in revisione</h3>
+      <form hx-post="{% url 'invia_revisione' documento.pk %}" hx-target="#flusso" hx-swap="outerHTML">
+        {{ revisione_form.as_p }}
+        <button class="primario">Invia</button>
+      </form>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Attività</h2>
+    {% for e in eventi %}
+      <p class="attenuato">{{ e.creato|date:"d/m/Y H:i" }} · {{ e.utente.get_full_name|default:e.utente.username|default:"—" }} · {{ e.tipo }} {{ e.dettaglio }}</p>
+    {% endfor %}
+  </section>
+</div>
+{% endpartialdef %}
+{% partial flusso %}
+
+<section>
+  <h2>Versioni</h2>
+  <table>
+    {% for v in versioni %}
+      <tr><td>v{{ v.numero }}</td><td>{{ v.nome_file }}</td><td>{{ v.autore.get_full_name|default:v.autore.username }}</td>
+          <td>{{ v.creata|date:"d/m/Y H:i" }}</td><td>{{ v.nota }}</td>
+          <td><a href="{% url 'scarica' documento.pk v.numero %}">Scarica</a></td></tr>
+    {% endfor %}
+  </table>
+  {% if livello >= 2 %}
+    <h3>Nuova versione</h3>
+    <form method="post" action="{% url 'nuova_versione' documento.pk %}" enctype="multipart/form-data">{% csrf_token %}
+      {{ versione_form.as_p }}<button class="primario">Carica</button>
+    </form>
+  {% endif %}
+  <h3>Contenuto della versione corrente</h3>
+  <pre class="contenuto">{{ documento.versione_corrente.testo }}</pre>
+</section>
+
+{% if livello == PROPRIETARIO %}
+<section>
+  <h2>Chi può vedere questo documento</h2>
+  <table>
+    {% for a in accessi %}
+      <tr><td>{{ a.utente.get_full_name|default:a.utente.username }}</td><td>{{ a.get_livello_display }}</td>
+          <td><form method="post" action="{% url 'revoca' documento.pk a.utente_id %}">{% csrf_token %}<button class="pericolo">Revoca</button></form></td></tr>
+    {% empty %}
+      <tr><td class="attenuato">Solo tu.</td></tr>
+    {% endfor %}
+  </table>
+  <form method="post" action="{% url 'accesso' documento.pk %}" class="riga">{% csrf_token %}
+    {{ accesso_form.utente }} {{ accesso_form.livello }} <button>Concedi</button>
+  </form>
+</section>
+{% endif %}
+{% endblock %}

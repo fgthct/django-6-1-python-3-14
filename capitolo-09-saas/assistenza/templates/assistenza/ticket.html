@@ -1,0 +1,39 @@
+{% extends "assistenza/base.html" %}
+{% block titolo %}{{ ticket.titolo }}{% endblock %}
+{% block contenuto %}
+<h1>{{ ticket.titolo }}</h1>
+<p>Da {{ ticket.richiedente }} — priorità {{ ticket.get_priorita_display }}</p>
+<p>{{ ticket.descrizione|linebreaksbr }}</p>
+
+{% partialdef stato %}
+<form id="stato" hx-post="{% url 'cambia_stato' ticket.pk %}" hx-trigger="change" hx-swap="outerHTML">
+  <label>Stato
+    <select name="stato" {% if not puo_scrivere %}disabled{% endif %}>
+      {% for valore, etichetta in stati %}
+        <option value="{{ valore }}" {% if valore == ticket.stato %}selected{% endif %}>{{ etichetta }}</option>
+      {% endfor %}
+    </select>
+  </label>
+</form>
+{% endpartialdef %}
+{% partial stato %}
+
+<h2>Commenti</h2>
+{% partialdef commenti %}
+<ul id="commenti">
+  {% for c in commenti %}
+    <li><b>{{ c.autore.user.email|default:"?" }}</b>: {{ c.testo }}</li>
+  {% empty %}
+    <li>Nessun commento.</li>
+  {% endfor %}
+</ul>
+{% endpartialdef %}
+{% partial commenti %}
+
+{% if puo_scrivere %}
+<form hx-post="{% url 'commenta' ticket.pk %}" hx-target="#commenti" hx-swap="outerHTML">
+  {{ form.as_p }}
+  <button>Commenta</button>
+</form>
+{% endif %}
+{% endblock %}

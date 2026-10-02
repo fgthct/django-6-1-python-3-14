@@ -1,0 +1,9 @@
+{% extends "assistenza/base.html" %}
+{% block titolo %}Accedi{% endblock %}
+{% block contenuto %}
+<h1>Accedi</h1>
+<form method="post">{% csrf_token %}
+  {{ form.as_p }}
+  <button>Entra</button>
+</form>
+{% endblock %}

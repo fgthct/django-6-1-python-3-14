@@ -1,0 +1,66 @@
+{% extends "documenti/base.html" %}
+{% block contenuto %}
+<section>
+  <h1>Documenti</h1>
+  <table>
+    <thead><tr><th>Titolo</th><th>Proprietario</th><th>Versione</th><th>Stato</th></tr></thead>
+    <tbody>
+    {% for d in documenti %}
+      <tr>
+        <td><a href="{% url 'dettaglio' d.pk %}">{{ d.titolo }}</a></td>
+        <td>{{ d.proprietario.get_full_name|default:d.proprietario.username }}</td>
+        <td>v{{ d.versione_corrente.numero }}</td>
+        <td><span class="etichetta {{ d.stato }}">{{ d.get_stato_display }}</span></td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" class="attenuato">Nessun documento.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <h2>Cerca per significato</h2>
+  <form class="riga" hx-get="{% url 'cerca' %}" hx-target="#risultati" hx-swap="outerHTML">
+    <input name="q" size="40" placeholder="Che cosa stai cercando?">
+    <button>Cerca</button>
+  </form>
+  {% partialdef risultati %}
+  <div id="risultati">
+    {% if q %}
+      {% for c in risultati %}
+        <p><a href="{% url 'dettaglio' c.versione.documento.pk %}">{{ c.versione.documento.titolo }}</a>
+           <span class="attenuato">· distanza {{ c.distanza|floatformat:3 }}</span><br>{{ c.testo|truncatewords:40 }}</p>
+      {% empty %}
+        <p class="attenuato">Nessun risultato fra i documenti che puoi vedere.</p>
+      {% endfor %}
+    {% endif %}
+  </div>
+  {% endpartialdef %}
+  {% partial risultati %}
+</section>
+
+<section>
+  <h2>Chiedi ai documenti</h2>
+  <form class="riga" hx-post="{% url 'chiedi' %}" hx-target="#risposta" hx-swap="outerHTML">
+    <input name="q" size="40" placeholder="Una domanda">
+    <button>Chiedi</button>
+  </form>
+  {% partialdef risposta %}
+  <div id="risposta">
+    {% if risposta %}
+      <p>{{ risposta.testo }}</p>
+      {% for c in risposta.fonti %}<p class="attenuato">Fonte: {{ c.versione.documento.titolo }} (v{{ c.versione.numero }})</p>{% endfor %}
+    {% endif %}
+  </div>
+  {% endpartialdef %}
+  {% partial risposta %}
+</section>
+
+<section>
+  <h2>Nuovo documento</h2>
+  <form method="post" action="{% url 'nuovo' %}" enctype="multipart/form-data">{% csrf_token %}
+    {{ form.as_p }}<button class="primario">Carica</button>
+  </form>
+</section>
+{% endblock %}

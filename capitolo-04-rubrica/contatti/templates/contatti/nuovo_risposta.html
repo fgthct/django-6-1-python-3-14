@@ -1,0 +1,7 @@
+{% include "contatti/elenco.html#form_nuovo" %}
+<template>
+  <tbody hx-swap-oob="afterbegin:#righe">
+    {% include "contatti/elenco.html#riga" %}
+  </tbody>
+</template>
+{% include "contatti/elenco.html#conteggio" with oob=True %}

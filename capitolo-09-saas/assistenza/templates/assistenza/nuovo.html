@@ -1,0 +1,9 @@
+{% extends "assistenza/base.html" %}
+{% block titolo %}Nuovo ticket{% endblock %}
+{% block contenuto %}
+<h1>Nuovo ticket</h1>
+<form method="post">{% csrf_token %}
+  {{ form.as_p }}
+  <button>Apri il ticket</button>
+</form>
+{% endblock %}

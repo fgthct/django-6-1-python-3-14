@@ -1,0 +1,13 @@
+body { font-family: system-ui, sans-serif; max-width: 60rem; margin: 1.5rem auto; padding: 0 1rem; }
+header { display: flex; justify-content: space-between; border-bottom: 1px solid #ddd; padding-bottom: .5rem; }
+#avviso { min-height: 1.4rem; color: #0a5c2b; }
+.prodotti { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr)); gap: 1rem; }
+.prodotti li { border: 1px solid #ddd; border-radius: .4rem; padding: .8rem; }
+.prodotti h2 { font-size: 1.1rem; margin: 0; }
+.categoria { color: #666; font-size: .85rem; margin: .2rem 0; }
+.prezzo { font-weight: bold; }
+table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+td, th { padding: .4rem .5rem; border-bottom: 1px solid #ddd; text-align: left; }
+.errore { color: #b00020; }
+.errorlist { color: #b00020; margin: 0; padding-left: 1rem; }
+.htmx-request { opacity: .6; }

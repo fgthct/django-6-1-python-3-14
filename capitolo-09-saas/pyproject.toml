@@ -1,0 +1,17 @@
+[project]
+name = "saas"
+version = "0.1.0"
+description = "Assistenza: un helpdesk multi-tenant con API, dashboard e CSP"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "django>=6.1.1",
+    "django-ninja>=1.7.1",
+    "psycopg[binary]>=3.3.6",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-django>=4.14.0",
+]

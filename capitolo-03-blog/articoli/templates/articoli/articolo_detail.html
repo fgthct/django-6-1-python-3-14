@@ -1,0 +1,31 @@
+{% extends "articoli/base.html" %}
+
+{% block titolo %}{{ object.titolo }}{% endblock %}
+
+{% block contenuto %}
+<article>
+  <h2>{{ object.titolo }}</h2>
+  <p class="meta">
+    {% if object.categoria %}{{ object.categoria.nome }} ·{% endif %}
+    {{ object.pubblicato_il|date:"d/m/Y" }}
+  </p>
+  {% if object.copertina %}<img src="{{ object.copertina.url }}" alt="" style="max-width:100%">{% endif %}
+  {{ object.testo|linebreaks }}
+  <p class="meta">
+    {% for tag in object.tags %}<a href="{% url 'articoli:elenco' %}?tag={{ tag|urlencode }}">#{{ tag }}</a> {% endfor %}
+  </p>
+</article>
+
+<h3>Commenti ({{ commenti|length }})</h3>
+{% for commento in commenti %}
+  <div class="commento"><strong>{{ commento.autore }}</strong><br>{{ commento.testo }}</div>
+{% empty %}
+  <p>Ancora nessun commento.</p>
+{% endfor %}
+
+<form method="post" action="{% url 'articoli:commenta' object.slug %}">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Invia commento</button>
+</form>
+{% endblock %}

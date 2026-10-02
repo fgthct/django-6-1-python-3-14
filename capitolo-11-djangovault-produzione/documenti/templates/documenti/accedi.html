@@ -1,0 +1,5 @@
+{% extends "documenti/base.html" %}
+{% block contenuto %}
+<section><h1>Accedi</h1>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button class="primario">Entra</button></form></section>
+{% endblock %}

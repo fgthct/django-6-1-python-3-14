@@ -1,0 +1,8 @@
+body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 0 auto; padding: 1rem; }
+header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; }
+nav { display: flex; gap: 1rem; align-items: center; }
+.contatori { display: flex; gap: 1.5rem; padding: .5rem 0; }
+.contatori b { font-size: 1.6rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .35rem; border-bottom: 1px solid #eee; }
+.filtri a { margin-right: .75rem; }

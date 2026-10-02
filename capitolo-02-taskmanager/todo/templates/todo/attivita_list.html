@@ -1,0 +1,49 @@
+{% extends "todo/base.html" %}
+
+{% block contenuto %}
+<h1>Attività</h1>
+
+<p>
+  Mostra:
+  <a href="{% url 'todo:elenco' %}">tutte</a> ·
+  <a href="?stato=aperte">aperte</a> ·
+  <a href="?stato=completate">completate</a>
+</p>
+
+<table>
+  <thead>
+    <tr><th>Titolo</th><th>Progetto</th><th>Scadenza</th><th></th></tr>
+  </thead>
+  <tbody>
+  {% for attivita in object_list %}
+    <tr>
+      <td class="{% if attivita.completata %}fatta{% endif %}">{{ attivita.titolo }}</td>
+      <td>{{ attivita.progetto.nome }}</td>
+      <td>{{ attivita.scadenza|date:"d/m/Y"|default:"—" }}</td>
+      <td>
+        <form class="inline" method="post" action="{% url 'todo:completa' attivita.pk %}">
+          {% csrf_token %}
+          <button type="submit">{% if attivita.completata %}Riapri{% else %}Fatto{% endif %}</button>
+        </form>
+        <a href="{% url 'todo:modifica' attivita.pk %}">Modifica</a>
+        <a href="{% url 'todo:elimina' attivita.pk %}">Elimina</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="4">Nessuna attività.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% if is_paginated %}
+<p>
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if stato %}&stato={{ stato }}{% endif %}">« precedente</a>
+  {% endif %}
+  Pagina {{ page_obj.number }} di {{ paginator.num_pages }}
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if stato %}&stato={{ stato }}{% endif %}">successiva »</a>
+  {% endif %}
+</p>
+{% endif %}
+{% endblock %}

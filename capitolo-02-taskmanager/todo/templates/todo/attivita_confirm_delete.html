@@ -1,0 +1,13 @@
+{% extends "todo/base.html" %}
+
+{% block contenuto %}
+<h1>Elimina attività</h1>
+
+<p>Vuoi davvero eliminare «{{ object.titolo }}»?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Sì, elimina</button>
+  <a href="{% url 'todo:elenco' %}">Annulla</a>
+</form>
+{% endblock %}

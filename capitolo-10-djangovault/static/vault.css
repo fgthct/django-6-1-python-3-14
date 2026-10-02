@@ -1,0 +1,35 @@
+/* DjangoVault: solo tema scuro. Nessuno sfondo chiaro, nemmeno nei controlli del browser. */
+:root {
+  color-scheme: dark;
+  --sfondo: #0d1117; --pannello: #161b22; --bordo: #2d333b; --testo: #d7dde4; --attenuato: #8b949e;
+  --accento: #4c9aff; --ok: #3fb950; --attenzione: #d29922; --errore: #f85149;
+}
+html { background: var(--sfondo); }
+body { margin: 0; background: var(--sfondo); color: var(--testo); font: 16px/1.5 system-ui, sans-serif; }
+a { color: var(--accento); }
+header { display: flex; justify-content: space-between; align-items: center; padding: .6rem 1.2rem;
+         background: var(--pannello); border-bottom: 1px solid var(--bordo); }
+header nav { display: flex; gap: 1rem; align-items: center; }
+main { max-width: 62rem; margin: 0 auto; padding: 1.2rem; }
+section, .scheda { background: var(--pannello); border: 1px solid var(--bordo); border-radius: 8px;
+                   padding: 1rem 1.2rem; margin: 0 0 1rem; }
+h1, h2, h3 { margin: .2rem 0 .6rem; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: .4rem; border-bottom: 1px solid var(--bordo); }
+input, select, textarea, button { background: #0b0f14; color: var(--testo); border: 1px solid var(--bordo);
+                                  border-radius: 6px; padding: .4rem .6rem; font: inherit; }
+button { background: #21262d; cursor: pointer; }
+button.primario { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+button.pericolo { border-color: var(--errore); color: var(--errore); }
+.etichetta { display: inline-block; padding: 0 .55rem; border-radius: 1rem; font-size: .85rem; border: 1px solid var(--bordo); }
+.etichetta.approvato { color: var(--ok); border-color: var(--ok); }
+.etichetta.in_revisione { color: var(--attenzione); border-color: var(--attenzione); }
+.messaggi { list-style: none; padding: 0; margin: 0 0 1rem; }
+.messaggi li { padding: .5rem .8rem; border-radius: 6px; border: 1px solid var(--bordo); margin-bottom: .4rem; }
+.messaggi .error { border-color: var(--errore); color: var(--errore); }
+.messaggi .success { border-color: var(--ok); color: var(--ok); }
+.attenuato { color: var(--attenuato); }
+pre.contenuto { background: #0b0f14; border: 1px solid var(--bordo); border-radius: 6px; padding: .8rem;
+                white-space: pre-wrap; max-height: 24rem; overflow: auto; }
+form p { margin: .4rem 0; }
+.riga { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }

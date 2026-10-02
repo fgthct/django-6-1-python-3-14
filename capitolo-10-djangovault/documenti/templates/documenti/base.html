@@ -1,0 +1,34 @@
+{% load static %}
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false}'>
+  <title>{% block titolo %}DjangoVault{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vault.css' %}">
+  <script src="{% static 'htmx.min.js' %}"></script>
+</head>
+<body>
+  <header>
+    <a href="{% url 'elenco' %}"><strong>DjangoVault</strong></a>
+    {% if user.is_authenticated %}
+      <nav>
+        <span class="attenuato">{{ user.get_full_name|default:user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Esci</button></form>
+      </nav>
+    {% endif %}
+  </header>
+  <main>
+    {% if messages %}<ul class="messaggi">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+    {% block contenuto %}{% endblock %}
+  </main>
+  <script nonce="{{ csp_nonce }}">
+    document.body.addEventListener("htmx:configRequest", function (e) {
+      e.detail.headers["X-CSRFToken"] = "{{ csrf_token }}";
+    });
+  </script>
+</body>
+</html>

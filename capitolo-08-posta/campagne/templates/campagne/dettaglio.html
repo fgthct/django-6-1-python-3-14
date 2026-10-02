@@ -1,0 +1,27 @@
+{% extends "campagne/base.html" %}
+{% block contenuto %}
+  <h1>{{ campagna.oggetto }}</h1>
+  <pre>{{ campagna.corpo }}</pre>
+  {% if campagna.stato == "bozza" %}
+    <form method="post" action="{% url 'avvia' campagna.pk %}">
+      {% csrf_token %}
+      <button type="submit">Avvia l'invio</button>
+    </form>
+  {% else %}
+    {% partial avanzamento %}
+  {% endif %}
+{% endblock %}
+
+{% partialdef avanzamento %}
+  <section id="avanzamento"
+    {% if campagna.stato == "in_invio" %}
+      hx-get="{% url 'avanzamento' campagna.pk %}" hx-trigger="every 2s" hx-swap="outerHTML"
+    {% endif %}>
+    <p><strong>{{ campagna.get_stato_display }}</strong></p>
+    <progress max="100" value="{{ conteggi.percentuale }}"></progress>
+    <p class="num">
+      {{ conteggi.inviate }} inviate · {{ conteggi.in_attesa }} in attesa · {{ conteggi.fallite }} fallite
+      (su {{ conteggi.totale }})
+    </p>
+  </section>
+{% endpartialdef %}

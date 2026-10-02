@@ -1,0 +1,32 @@
+{% load static %}
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titolo %}Assistenza{% endblock %}</title>
+  {# htmx inserisce di suo un <style>: con la CSP stretta va spento, o verrebbe bloccato #}
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false}'>
+  <link rel="stylesheet" href="{% static 'assistenza.css' %}">
+  <script src="{% static 'htmx.min.js' %}"></script>
+</head>
+<body>
+  <header>
+    <strong>{{ request.organizzazione.nome|default:"Assistenza" }}</strong>
+    {% if user.is_authenticated and request.organizzazione %}
+      <nav>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'nuovo' %}">Nuovo ticket</a>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button>Esci</button></form>
+      </nav>
+    {% endif %}
+  </header>
+  <main>{% block contenuto %}{% endblock %}</main>
+  {# L'unico script in linea: porta il token CSRF in ogni richiesta htmx. Ha il nonce, altrimenti la CSP lo blocca. #}
+  <script nonce="{{ csp_nonce }}">
+    document.body.addEventListener("htmx:configRequest", function (e) {
+      e.detail.headers["X-CSRFToken"] = "{{ csrf_token }}";
+    });
+  </script>
+</body>
+</html>

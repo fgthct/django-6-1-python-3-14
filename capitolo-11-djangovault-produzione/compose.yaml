@@ -1,0 +1,61 @@
+name: vault
+
+x-app: &app
+  build: .
+  env_file: .env
+  environment:
+    DB_HOST: db
+    TRUST_PROXY_SSL: "1"
+  volumes:
+    - dati:/dati
+
+services:
+  db:
+    image: pgvector/pgvector:pg18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql
+      - ./deploy/crea-estensioni.sql:/docker-entrypoint-initdb.d/10-estensioni.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  migra:
+    <<: *app
+    command: python manage.py migrate --noinput
+    depends_on:
+      db: {condition: service_healthy}
+    restart: "no"
+
+  web:
+    <<: *app
+    restart: unless-stopped
+    depends_on:
+      db: {condition: service_healthy}
+      migra: {condition: service_completed_successfully}
+    # La porta 8000 NON è pubblicata: dall'esterno si arriva solo attraverso il proxy.
+
+  proxy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMINIO: ${DOMINIO}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_dati:/data
+    depends_on:
+      web: {condition: service_healthy}
+
+volumes:
+  pgdata:
+  dati:
+  caddy_dati:

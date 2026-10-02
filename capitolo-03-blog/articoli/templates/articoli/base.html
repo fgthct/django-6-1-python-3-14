@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titolo %}Il blog{% endblock %}</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 44rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    a { color: #1a5e8a; }
+    mark { background: #ffe58a; }
+    .meta { color: #666; font-size: .9rem; }
+    form.ricerca { display: flex; gap: .5rem; margin: 1rem 0; }
+    form.ricerca input[type=search] { flex: 1; padding: .4rem; }
+    article { margin: 1.5rem 0; padding-bottom: 1rem; border-bottom: 1px solid #ddd; }
+    .commento { background: #f5f5f5; padding: .5rem .8rem; margin: .5rem 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><a href="{% url 'articoli:elenco' %}">Il blog</a></h1>
+    <form class="ricerca" method="get" action="{% url 'articoli:elenco' %}">
+      <input type="search" name="q" value="{{ q|default:'' }}" placeholder="Cerca negli articoli">
+      <button type="submit">Cerca</button>
+    </form>
+  </header>
+  {% block contenuto %}{% endblock %}
+</body>
+</html>

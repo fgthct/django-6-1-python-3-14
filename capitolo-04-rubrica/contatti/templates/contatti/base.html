@@ -1,0 +1,23 @@
+{% load static %}<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titolo %}Rubrica{% endblock %}</title>
+  <script src="{% static 'htmx.min.js' %}" defer></script>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 52rem; margin: 2rem auto; padding: 0 1rem; }
+    table { width: 100%; border-collapse: collapse; }
+    td, th { padding: .4rem .5rem; border-bottom: 1px solid #ddd; text-align: left; }
+    tr.htmx-swapping { opacity: 0; transition: opacity 300ms ease-out; }
+    .htmx-indicator { opacity: 0; transition: opacity 200ms; }
+    .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+    aside { background: #f3f6fa; padding: .6rem 1rem; margin: 1rem 0; min-height: 1rem; }
+    .errorlist { color: #b00020; margin: 0; padding-left: 1rem; }
+    form div { margin: .3rem 0; }
+  </style>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  {% block contenuto %}{% endblock %}
+</body>
+</html>

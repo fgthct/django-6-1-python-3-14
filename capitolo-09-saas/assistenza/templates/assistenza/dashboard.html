@@ -1,0 +1,50 @@
+{% extends "assistenza/base.html" %}
+{% block titolo %}Dashboard{% endblock %}
+{% block contenuto %}
+<h1>Dashboard</h1>
+
+{% partialdef contatori %}
+<section id="contatori" class="contatori"
+         hx-get="{% url 'contatori' %}" hx-trigger="every 5s" hx-swap="outerHTML">
+  <div><b>{{ contatori.aperti }}</b> aperti</div>
+  <div><b>{{ contatori.in_lavorazione }}</b> in lavorazione</div>
+  <div><b>{{ contatori.chiusi }}</b> chiusi</div>
+</section>
+{% endpartialdef %}
+{% partial contatori %}
+
+<p class="filtri">
+  <a href="{% url 'dashboard' %}" hx-get="{% url 'dashboard' %}" hx-target="#elenco" hx-swap="outerHTML" hx-push-url="true">Tutti</a>
+  {% for valore, etichetta in stati %}
+    <a href="?stato={{ valore }}" hx-get="?stato={{ valore }}" hx-target="#elenco" hx-swap="outerHTML" hx-push-url="true">{{ etichetta }}</a>
+  {% endfor %}
+</p>
+
+{% partialdef elenco %}
+<div id="elenco">
+  <table>
+    <thead><tr><th>Titolo</th><th>Stato</th><th>Priorità</th><th>Assegnato a</th></tr></thead>
+    <tbody>
+    {% for t in pagina %}
+      <tr>
+        <td><a href="{% url 'ticket' t.pk %}">{{ t.titolo }}</a></td>
+        <td>{{ t.get_stato_display }}</td>
+        <td>{{ t.get_priorita_display }}</td>
+        <td>{{ t.assegnato.user.email|default:"—" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4">Nessun ticket.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <p>
+    {% if pagina.has_previous %}<a href="?pagina={{ pagina.previous_page_number }}&stato={{ stato }}"
+       hx-get="?pagina={{ pagina.previous_page_number }}&stato={{ stato }}" hx-target="#elenco" hx-swap="outerHTML">← precedente</a>{% endif %}
+    Pagina {{ pagina.number }} di {{ pagina.paginator.num_pages }}
+    {% if pagina.has_next %}<a href="?pagina={{ pagina.next_page_number }}&stato={{ stato }}"
+       hx-get="?pagina={{ pagina.next_page_number }}&stato={{ stato }}" hx-target="#elenco" hx-swap="outerHTML">successiva →</a>{% endif %}
+  </p>
+</div>
+{% endpartialdef %}
+{% partial elenco %}
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "vetrina/base.html" %}
+
+{% block titolo %}Carrello{% endblock %}
+{% block contenuto %}
+<h1>Il tuo carrello</h1>
+<div id="carrello">
+{% partialdef contenuto inline %}
+  {% if oob %}{% include "vetrina/base.html#badge" %}{% endif %}
+  {% if errore %}<p class="errore" role="alert">{{ errore }}</p>{% endif %}
+  {% if righe %}
+  <table>
+    <thead><tr><th>Prodotto</th><th>Prezzo</th><th>Quantità</th><th>Subtotale</th></tr></thead>
+    <tbody>
+    {% for r in righe %}
+      <tr>
+        <td>{{ r.prodotto.nome }}</td>
+        <td>€ {{ r.prodotto.prezzo }}</td>
+        <td>
+          <form method="post" action="{% url 'vetrina:imposta' r.prodotto.pk %}"
+                hx-post="{% url 'vetrina:imposta' r.prodotto.pk %}" hx-target="#carrello" hx-swap="innerHTML"
+                hx-trigger="input delay:500ms, submit">
+            {% csrf_token %}
+            <input type="number" name="quantita" value="{{ r.quantita }}" min="0" max="99" aria-label="Quantità di {{ r.prodotto.nome }}">
+            <button type="submit">Aggiorna</button>
+          </form>
+        </td>
+        <td>€ {{ r.subtotale }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+    <tfoot><tr><th colspan="3">Totale</th><th>€ {{ totale }}</th></tr></tfoot>
+  </table>
+  <form method="post" action="{% url 'vetrina:ordina' %}" hx-post="{% url 'vetrina:ordina' %}"
+        hx-target="#carrello" hx-swap="innerHTML">
+    {% csrf_token %}
+    {{ form }}
+    <button type="submit">Conferma l'ordine</button>
+  </form>
+  {% else %}
+  <p>Il carrello è vuoto. <a href="{% url 'vetrina:catalogo' %}">Torna al catalogo</a>.</p>
+  {% endif %}
+{% endpartialdef %}
+</div>
+{% endblock %}

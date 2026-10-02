@@ -1,0 +1,9 @@
+{% extends "vetrina/base.html" %}
+{% block contenuto %}
+<h1>Grazie!</h1>
+<p>Ordine n. {{ ordine.pk }} per {{ ordine.email }}.</p>
+<ul>
+  {% for r in ordine.righe.all %}<li>{{ r.quantita }} × {{ r.prodotto.nome }} (€ {{ r.prezzo_unitario }})</li>{% endfor %}
+</ul>
+<p><a href="{% url 'vetrina:catalogo' %}">Continua gli acquisti</a></p>
+{% endblock %}

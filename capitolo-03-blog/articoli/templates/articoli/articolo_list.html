@@ -1,0 +1,37 @@
+{% extends "articoli/base.html" %}
+{% load blog_extra %}
+
+{% block contenuto %}
+{% if q %}
+  <p class="meta">{{ paginator.count }} risultati per «{{ q }}»</p>
+{% endif %}
+
+{% for articolo in object_list %}
+  <article>
+    <h2><a href="{{ articolo.get_absolute_url }}">{{ articolo.titolo }}</a></h2>
+    <p class="meta">
+      {% if articolo.categoria %}{{ articolo.categoria.nome }} ·{% endif %}
+      {{ articolo.pubblicato_il|date:"d/m/Y" }}
+    </p>
+    {% if q %}
+      <p>{{ articolo.estratto|evidenzia }}</p>
+    {% else %}
+      <p>{{ articolo.sommario }}</p>
+    {% endif %}
+  </article>
+{% empty %}
+  <p>Nessun articolo trovato.</p>
+{% endfor %}
+
+{% if is_paginated %}
+<p>
+  {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">« precedente</a>
+  {% endif %}
+  Pagina {{ page_obj.number }} di {{ paginator.num_pages }}
+  {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q|urlencode }}{% endif %}">successiva »</a>
+  {% endif %}
+</p>
+{% endif %}
+{% endblock %}

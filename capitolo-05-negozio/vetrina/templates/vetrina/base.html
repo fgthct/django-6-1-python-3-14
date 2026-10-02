@@ -1,0 +1,24 @@
+{% load static %}<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="htmx-config" content='{"allowEval": false, "includeIndicatorStyles": false}'>
+  <title>{% block titolo %}Bottega{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'negozio.css' %}">
+  <script src="{% static 'htmx.min.js' %}" defer></script>
+  <script {% csp_nonce_attr %}>
+    document.addEventListener("messaggio", (e) => {
+      document.getElementById("avviso").textContent = e.detail.testo;
+    });
+  </script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+  <header>
+    <a href="{% url 'vetrina:catalogo' %}"><strong>Bottega</strong></a>
+    {% partialdef badge inline %}<a id="badge-carrello" href="{% url 'vetrina:carrello' %}"{% if oob %} hx-swap-oob="true"{% endif %}>Carrello ({{ carrello.conteggio }})</a>{% endpartialdef %}
+  </header>
+  <p id="avviso" role="status" aria-live="polite"></p>
+  <main>{% block contenuto %}{% endblock %}</main>
+</body>
+</html>

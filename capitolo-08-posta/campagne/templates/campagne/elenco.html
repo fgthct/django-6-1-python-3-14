@@ -1,0 +1,18 @@
+{% extends "campagne/base.html" %}
+{% block contenuto %}
+  <h1>Campagne</h1>
+  <ul>
+    {% for c in campagne %}
+      <li><a href="{% url 'dettaglio' c.pk %}">{{ c.oggetto }}</a> — {{ c.get_stato_display }}</li>
+    {% empty %}
+      <li>Nessuna campagna.</li>
+    {% endfor %}
+  </ul>
+  <h2>Nuova campagna</h2>
+  <form method="post">
+    {% csrf_token %}
+    <p><label>Oggetto<br><input type="text" name="oggetto" required></label></p>
+    <p><label>Testo (usa {nome})<br><textarea name="corpo" rows="6" required></textarea></label></p>
+    <button type="submit">Crea bozza</button>
+  </form>
+{% endblock %}

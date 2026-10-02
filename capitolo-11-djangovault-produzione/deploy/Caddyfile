@@ -1,0 +1,10 @@
+{$DOMINIO} {
+	encode zstd gzip
+	# Caddy ottiene e rinnova da solo il certificato per un dominio pubblico (per «localhost» ne crea uno interno).
+	# X-Forwarded-Proto lo imposta Caddy, sovrascrivendo qualunque valore mandato dal cliente.
+	header -Server
+	reverse_proxy web:8000
+	request_body {
+		max_size 5MB
+	}
+}

@@ -1,0 +1,51 @@
+{% extends "vetrina/base.html" %}
+
+{% block contenuto %}
+<h1>Catalogo</h1>
+<form role="search" method="get" action="{% url 'vetrina:catalogo' %}"
+      hx-get="{% url 'vetrina:catalogo' %}" hx-target="#griglia" hx-push-url="true"
+      hx-trigger="input delay:300ms, submit">
+  <input type="search" name="q" value="{{ q }}" placeholder="Cerca un prodotto" autocomplete="off">
+  <select name="categoria" aria-label="Categoria">
+    <option value="">Tutte le categorie</option>
+    {% for c in categorie %}<option value="{{ c.pk }}"{% if categoria == c.pk|stringformat:"s" %} selected{% endif %}>{{ c.nome }}</option>{% endfor %}
+  </select>
+  <button type="submit">Cerca</button>
+</form>
+
+<div id="griglia">
+{% partialdef griglia inline %}
+  <p>{{ totale }} prodotti</p>
+  <ul class="prodotti">
+    {% for prodotto in prodotti %}
+      <li>
+        <h2>{{ prodotto.nome }}</h2>
+        <p class="categoria">{{ prodotto.categoria.nome }}</p>
+        <p>{{ prodotto.descrizione }}</p>
+        <p class="prezzo">€ {{ prodotto.prezzo }}</p>
+        {% if prodotto.giacenza %}
+          <form method="post" action="{% url 'vetrina:aggiungi' prodotto.pk %}"
+                hx-post="{% url 'vetrina:aggiungi' prodotto.pk %}" hx-target="#badge-carrello" hx-swap="outerHTML">
+            {% csrf_token %}
+            <button type="submit">Aggiungi al carrello</button>
+          </form>
+        {% else %}
+          <p><em>Esaurito</em></p>
+        {% endif %}
+      </li>
+    {% empty %}
+      <li>Nessun prodotto trovato.</li>
+    {% endfor %}
+  </ul>
+  <nav aria-label="Pagine">
+    {% if precedente %}<a href="?q={{ q|urlencode }}&categoria={{ categoria|urlencode }}&pagina={{ precedente }}"
+       hx-get="{% url 'vetrina:catalogo' %}?q={{ q|urlencode }}&categoria={{ categoria|urlencode }}&pagina={{ precedente }}"
+       hx-target="#griglia" hx-push-url="true">← Precedente</a>{% endif %}
+    Pagina {{ pagina.number }}
+    {% if successiva %}<a href="?q={{ q|urlencode }}&categoria={{ categoria|urlencode }}&pagina={{ successiva }}"
+       hx-get="{% url 'vetrina:catalogo' %}?q={{ q|urlencode }}&categoria={{ categoria|urlencode }}&pagina={{ successiva }}"
+       hx-target="#griglia" hx-push-url="true">Successiva →</a>{% endif %}
+  </nav>
+{% endpartialdef %}
+</div>
+{% endblock %}

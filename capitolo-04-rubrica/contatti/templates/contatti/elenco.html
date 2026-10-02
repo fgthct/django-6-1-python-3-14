@@ -1,0 +1,97 @@
+{% extends "contatti/base.html" %}
+
+{% block contenuto %}
+<h1>Rubrica
+  {% partialdef conteggio inline %}<small id="conteggio"
+        hx-get="{% url 'contatti:conteggio' %}"
+        hx-trigger="contattiCambiati from:body"
+        hx-swap="outerHTML"
+        {% if oob %}hx-swap-oob="true"{% endif %}>({{ totale }} contatti)</small>{% endpartialdef %}
+</h1>
+
+<form role="search" method="get" action="{% url 'contatti:elenco' %}">
+  <input type="search" name="q" value="{{ q }}" placeholder="Cerca per nome, email o città"
+         autocomplete="off"
+         hx-get="{% url 'contatti:elenco' %}"
+         hx-trigger="input changed delay:300ms, search"
+         hx-target="#righe"
+         hx-push-url="true"
+         hx-indicator="#attesa">
+  <button type="submit">Cerca</button>
+  <span id="attesa" class="htmx-indicator">Ricerca in corso…</span>
+</form>
+
+<aside id="dettaglio" aria-live="polite"></aside>
+
+{% partialdef dettaglio %}
+  <strong>{{ contatto.nome }}</strong><br>
+  {{ contatto.email }}<br>
+  {% if contatto.telefono %}Tel. {{ contatto.telefono }}<br>{% endif %}
+  {% if contatto.citta %}{{ contatto.citta }}{% endif %}
+{% endpartialdef %}
+
+<table>
+  <thead><tr><th>Nome</th><th>Email</th><th>Città</th><th></th></tr></thead>
+  <tbody id="righe" aria-live="polite">
+    {% partialdef righe inline %}
+      {% for contatto in pagina %}
+        {% partial riga %}
+      {% empty %}
+        <tr><td colspan="4">Nessun contatto trovato.</td></tr>
+      {% endfor %}
+      {% if pagina.has_next %}
+        <tr id="carica-altri">
+          <td colspan="4">
+            <button type="button"
+                    hx-get="{% url 'contatti:elenco' %}?q={{ q|urlencode }}&pagina={{ pagina.next_page_number }}"
+                    hx-target="#carica-altri"
+                    hx-swap="outerHTML">Carica altri</button>
+          </td>
+        </tr>
+      {% endif %}
+    {% endpartialdef %}
+  </tbody>
+</table>
+
+{% partialdef riga %}
+<tr id="contatto-{{ contatto.pk }}">
+  <td>{{ contatto.nome }}</td>
+  <td>{{ contatto.email }}</td>
+  <td>{{ contatto.citta }}</td>
+  <td>
+    <button type="button" hx-get="{% url 'contatti:dettaglio' contatto.pk %}"
+            hx-target="#dettaglio">Dettagli</button>
+    <button type="button" hx-get="{% url 'contatti:modifica' contatto.pk %}"
+            hx-target="closest tr" hx-swap="outerHTML">Modifica</button>
+    <button type="button" hx-delete="{% url 'contatti:elimina' contatto.pk %}"
+            hx-confirm="Eliminare {{ contatto.nome }}?"
+            hx-target="closest tr" hx-swap="outerHTML swap:300ms">Elimina</button>
+  </td>
+</tr>
+{% endpartialdef %}
+
+{% partialdef riga_modifica %}
+<tr id="contatto-{{ contatto.pk }}">
+  <td colspan="4">
+    <form hx-post="{% url 'contatti:modifica' contatto.pk %}"
+          hx-target="closest tr" hx-swap="outerHTML">
+      {% csrf_token %}
+      {{ form }}
+      <button type="submit">Salva</button>
+      <button type="button" hx-get="{% url 'contatti:riga' contatto.pk %}"
+              hx-target="closest tr" hx-swap="outerHTML">Annulla</button>
+    </form>
+  </td>
+</tr>
+{% endpartialdef %}
+
+<h2>Nuovo contatto</h2>
+{% partialdef form_nuovo inline %}
+<form id="form-nuovo" method="post" action="{% url 'contatti:nuovo' %}"
+      hx-post="{% url 'contatti:nuovo' %}" hx-target="this" hx-swap="outerHTML">
+  {% csrf_token %}
+  {{ form }}
+  <button type="submit">Aggiungi</button>
+</form>
+{% endpartialdef %}
+{% endblock %}
