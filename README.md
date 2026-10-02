@@ -5,6 +5,8 @@ di Franky Bonanno (*Dal primo progetto alla produzione: applicazioni web complet
 con PostgreSQL, ricerca semantica con pgvector e interfacce dinamiche con HTMX*),
 disponibile su Amazon.
 
+Trovi il libro e gli altri miei titoli sulla [pagina autore Amazon](https://www.amazon.it/Franky-Bonanno/e/B0GCXTHBK3).
+
 Ogni cartella è un progetto **autonomo**: puoi entrare, installare le dipendenze
 e avviarlo senza toccare il resto. Puoi anche fare il fork di un solo progetto
 e usarlo come base per il tuo.
